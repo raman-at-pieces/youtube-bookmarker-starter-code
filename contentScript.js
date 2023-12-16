@@ -1,5 +1,5 @@
 (() => {
-    let youtubeLeftControls, youtubePlayer;
+    let youtubeRightControls, autonavButton, youtubePlayer;
     let currentVideo = "";
     let currentVideoBookmarks = [];
 
@@ -10,46 +10,66 @@
             currentVideo = videoId;
             newVideoLoaded();
         }
+        else if (type === "PLAY") {
+            youtubePlayer.currentTime = value;
+        }
+        else if (type === "DELETE") {
+            currentVideoBookmarks = currentVideoBookmarks.filter((b) => b.time != value);
+            chrome.storage.sync.set({[currentVideo]: JSON.stringify(currentVideoBookmarks)});
+
+            response(currentVideoBookmarks);
+        }
     });
 
-    const newVideoLoaded = () => {
-        const bookmarkBtnExists = document.getElementsByClassName("bookmark-btn")[0];
-        console.log(bookmarkBtnExists);
+    const fetchBookmarks = () => {
+        return new Promise((resolve) => {
+            chrome.storage.sync.get([currentVideo], (obj) => {
+                resolve(obj[currentVideo] ? JSON.parse(obj[currentVideo]) : []);
+            });
+        });
+    };
 
-        if (!bookmarkBtnExists) {
-            const bookmarkBtn = document.createElement("img");
-
-            bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
-            bookmarkBtn.className = "ytp-button " + "bookmark-btn";
-            bookmarkBtn.title = "Click to bookmark current timestamp";
-
-            youtubeLeftControls = document.getElementsByClassName("ytp-left-controls")[0];
-            youtubePlayer = document.getElementsByClassName("video-stream")[0];
-            
-            youtubeLeftControls.append(bookmarkBtn);
-            bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
-        }
-    }
-
-    const addNewBookmarkEventHandler = () => {
+    const addNewBookmarkEventHandler = async () => {
         const currentTime = youtubePlayer.currentTime;
         const newBookmark = {
             time: currentTime,
             desc: "Bookmark at " + getTime(currentTime),
         };
-        console.log(newBookmark);
+        currentVideoBookmarks = await fetchBookmarks();
 
         chrome.storage.sync.set({
             [currentVideo]: JSON.stringify([...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time))
         });
-    }
+    };
+
+    const newVideoLoaded = async () => {
+        const bookmarkBtnExists = document.getElementsByClassName("bookmark-btn")[0];
+        currentVideoBookmarks = await fetchBookmarks();
+
+        if (!bookmarkBtnExists) {
+            const bookmarkBtn = document.createElement("img");
+
+            bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
+            bookmarkBtn.className = "ytp-button" + " bookmark-btn";
+            bookmarkBtn.title = "Click to bookmark current timestamp";
+
+            youtubeRightControls = document.getElementsByClassName("ytp-right-controls")[0];
+            youtubePlayer = document.getElementsByClassName("video-stream")[0];
+            
+            autonavButton = youtubeRightControls.getElementsByClassName("ytp-button").item(1);
+            autonavButton.after(bookmarkBtn);
+            bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
+        }
+    };
 
     newVideoLoaded();
 })();
 
 const getTime = t => {
     var date = new Date(0);
-    date.setSeconds(1);
+    date.setSeconds(t);
 
-    return date.toISOString().substr(11, 0);
-}
+    time = date.toISOString().substr(11, 9);
+    ms = String((t%1).toFixed(3)).substring(2);
+    return time + ms;
+};
