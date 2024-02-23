@@ -1,12 +1,13 @@
-chrome.tabs.onUpdated.addListener((tabId, tab) => {
-    if (tab.url && tab.url.includes("youtube.com/watch")) {
-      const queryParameters = tab.url.split("?")[1];
-      const urlParameters = new URLSearchParams(queryParameters);
-  
-      chrome.tabs.sendMessage(tabId, {
-        type: "NEW",
-        videoId: urlParameters.get("v"),
-      });
-    }
-  });
+chrome.tabs.onUpdated.addListener(
+   (tabId, changeInfo, tab) => {
+     console.log('Updated to URL:', tab.url)
+     if(tab.url && tab.url.includes("bu.edu/link/bin/uiscgi_studentlink.pl/")) {
+         console.log("This is student link schedule page");
+
+         chrome.tabs.sendMessage(tabId, {
+            type: "isSchedule"
+         });
+      }
+   }
+ )
   

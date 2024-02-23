@@ -1,15 +1,15 @@
 {
-    "name": "My YT Bookmarks",
+    "name": "BU Schedule Downloader",
     "version": "0.1.0",
-    "description": "Saving timestamps in YT videos",
-    "permissions": ["storage", "tabs"],
-    "host_permissions": ["https://*.youtube.com/*"],
+    "description": "Converts BU class schedule to ics file for Google Calender",
+    "permissions": ["tabs"],
+    "host_permissions": ["https://*.bu.edu/*"],
     "background": {
       "service_worker": "background.js"
     },
     "content_scripts": [
       {
-        "matches": ["https://*.youtube.com/*"],
+        "matches": ["https://*.bu.edu/*"],
         "js": ["contentScript.js"]
       }
     ],
@@ -19,9 +19,10 @@
           "assets/bookmark.png",
           "assets/play.png",
           "assets/delete.png",
+          "assets/download.png",
           "assets/save.png"
         ],
-        "matches": ["https://*.youtube.com/*"]
+        "matches": ["https://*.bu.edu/*"]
       }
     ],
     "action": {
@@ -30,7 +31,7 @@
         "24": "assets/ext-icon.png",
         "32": "assets/ext-icon.png"
       },
-      "default_title": "My YT Bookmarks",
+      "default_title": "BU Schedule Downloader",
       "default_popup": "popup.html"
     },
     "manifest_version": 3
