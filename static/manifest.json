@@ -4,6 +4,12 @@
     "description": "Converts BU class schedule to ics file for Google Calender",
     "permissions": ["tabs"],
     "host_permissions": ["https://*.bu.edu/*"],
+    "content_scripts": [
+      {
+        "matches": ["https://*.bu.edu/*"],
+        "js": ["contentScript.js"]
+      }
+    ],
     "web_accessible_resources": [
       {
         "resources": [
