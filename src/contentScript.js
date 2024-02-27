@@ -2,11 +2,14 @@ import * as ics from 'ics'
 import { parseRow } from './utils'
 
 (() => {
-   chrome.runtime.onMessage.addListener((obj, sender, response) => {
-      const { type, tabId } = obj;
+   console.log("Content script injected");
 
-      if (type === "toDownload") {
-         console.log("Got download message");
+   // Recieve message listener
+   chrome.runtime.onMessage.addListener((obj, sender, response) => {
+      const { type, value, tabId } = obj;
+
+      if (type === "generateFile") {
+         console.log("Got generate file message");
          getCurrentSchedule();
       }
    });

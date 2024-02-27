@@ -24,7 +24,8 @@ const onDownload = async () => {
 document.addEventListener("DOMContentLoaded", async () => {
    const activeTab = await getActiveTabURL();
 
-   if (activeTab.url.includes("bu.edu/link/bin/uiscgi_studentlink.pl/")) {
+   if (activeTab.url.includes("bu.edu/link/bin/uiscgi_studentlink.pl/") && 
+         activeTab.url.includes("allsched.pl")) {
       // Add download button and functionality
       const downloadButton = document.getElementById("download")
       setButtonControl("download", "Download schedule", onDownload, downloadButton)
