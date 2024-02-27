@@ -4,23 +4,23 @@
     "description": "Converts BU class schedule to ics file for Google Calender",
     "permissions": ["tabs"],
     "host_permissions": ["https://*.bu.edu/*"],
-    "background": {
-      "service_worker": "background.js"
-    },
     "content_scripts": [
       {
         "matches": ["https://*.bu.edu/*"],
-        "js": ["contentScript.js"]
+        "js": [
+            "contentScript.js",
+            "node_modules/ics-js/dist/ics-js.js"
+         ]
       }
     ],
     "web_accessible_resources": [
       {
         "resources": [
-          "assets/bookmark.png",
-          "assets/play.png",
-          "assets/delete.png",
-          "assets/download.png",
-          "assets/save.png"
+          "./assets/bookmark.png",
+          "./assets/play.png",
+          "./assets/delete.png",
+          "./assets/download.png",
+          "./assets/save.png"
         ],
         "matches": ["https://*.bu.edu/*"]
       }

@@ -33,9 +33,9 @@ document.addEventListener("DOMContentLoaded", async () => {
    const activeTab = await getActiveTabURL();
 
    if (activeTab.url.includes("bu.edu/link/bin/uiscgi_studentlink.pl/")) {
-      // do something
+      // Add download button and functionality
       const downloadButton = document.getElementById("download")
-      await setButtonControl("download", "Download schedule", onDownload, downloadButton)
+      setButtonControl("download", "Download schedule", onDownload, downloadButton)
    } else {
       // when current tab is not BU schedule 
       const container = document.getElementsByClassName("container")[0];
