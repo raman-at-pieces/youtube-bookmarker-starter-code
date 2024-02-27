@@ -10,7 +10,7 @@ export async function getActiveTabURL() {
 
 // Parse one row of HTML element and returns an event object for ics package
 // Used in contentScript
-export const parseRow = (htmlElement) => {
+export const createClass = (htmlElement) => {
 
 }
 

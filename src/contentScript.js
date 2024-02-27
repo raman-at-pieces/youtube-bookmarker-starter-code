@@ -1,5 +1,5 @@
 import * as ics from 'ics'
-import { parseRow } from './utils'
+import { convertHTMLTableToArray, createClassEvent } from './utils'
 
 (() => {
    console.log("Content script injected");
@@ -10,52 +10,48 @@ import { parseRow } from './utils'
 
       if (type === "generateFile") {
          console.log("Got generate file message");
-         getCurrentSchedule();
+         createClassSchedule();
       }
    });
 
-   const getCurrentSchedule = () => {
-      // The table we want is the fourth on the page
-      const scheduleTable = document.getElementsByTagName("table")[4].lastChild
-      const rowArr = Array.from(scheduleTable.children)
-      rowArr.shift() // removes the top row bc it's the titles
+   const createClassSchedule = () => {
+      // init
+      let classes = [] // list for all classes
 
-      const firstRow = Array.from(rowArr.shift().children) // process first row of schedule, bc it also contains the sidebar
-      firstRow.shift() // removes the sidebar
-      // console.log(firstRow) 
-   }
+      // Gets corresbonding table from website
+      let scheduleTable = document.getElementsByTagName("table")[4].lastChild
 
-   const event = {
-      start: [2018, 5, 30, 6, 30],
-      duration: { hours: 6, minutes: 30 },
-      title: 'Bolder Boulder',
-      description: 'Annual 10-kilometer run in Boulder, Colorado',
-      location: 'Folsom Field, University of Colorado (finish line)',
-      url: 'http://www.bolderboulder.com/',
-      geo: { lat: 40.0095, lon: 105.2669 },
-      categories: ['10k races', 'Memorial Day Weekend', 'Boulder CO'],
-      status: 'CONFIRMED',
-      busyStatus: 'BUSY',
-      organizer: { name: 'Admin', email: 'Race@BolderBOULDER.com' },
-      attendees: [
-        { name: 'Adam Gibbons', email: 'adam@example.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT' },
-        { name: 'Brittany Seaton', email: 'brittany@example2.org', dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
-      ]
-    }
-    
-    ics.createEvent(event, (error, value) => {
+      // Convert table and its rows to a 2-d array
+      // Each element is a cell of a single <td> element
+      let tableArr = convertHTMLTableToArray(scheduleTable)
+
+      console.log(tableArr);
+
+      // Create class from each row in tableArr
+      tableArr.forEach(row => {
+         classes.push(createClassEvent(row))
+      })
+
+      console.log(classes);
+
+      // convert classes array to ics formatting
+      let { error, value } = ics.createEvents(classes)
+
+      // handles ics error
       if (error) {
-        console.log(error)
-        return
-      }
-    
+         console.log(error)
+         return
+      } else {
+         // create ics file
          let blob = new Blob([value], { type: "text/calendar" });
+         // create url to host file
+         let url = URL.createObjectURL(blob)
 
-         // send message to background
+         // send message to background.js to download
          chrome.runtime.sendMessage({
             type: "downloadFile",
-            url: URL.createObjectURL(blob)
+            url: url
          })
-      })
+      }
    }
 })();
