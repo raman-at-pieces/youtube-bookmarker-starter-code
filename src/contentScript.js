@@ -1,4 +1,5 @@
 import * as ics from 'ics'
+import { parseRow } from './utils'
 
 (() => {
    chrome.runtime.onMessage.addListener((obj, sender, response) => {

@@ -1,12 +1,4 @@
-// Get active tab's url (used on popup page)
-async function getActiveTabURL() {
-   const tabs = await chrome.tabs.query({
-      currentWindow: true,
-      active: true
-   });
-
-   return tabs[0];
-}
+import { getActiveTabURL } from "./utils"
 
 // Adds functionality to control buttons
 const setButtonControl = (icon, title, eventListener, parentElement) => { 
@@ -42,3 +34,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.innerHTML = '<div class="title">This is not a BU schedule page.</div>';
    }
 });
+
+// send message to contentScript
+const onDownload = async () => {
+   const activeTab = await getActiveTabURL()
+
+   chrome.tabs.sendMessage(activeTab.id, {
+      type: "generateFile",
+      value: ""
+   })
+};
