@@ -45,6 +45,13 @@ import * as ics from 'ics'
         return
       }
     
-      console.log(value)
-    })
+         let blob = new Blob([value], { type: "text/calendar" });
+
+         // send message to background
+         chrome.runtime.sendMessage({
+            type: "downloadFile",
+            url: URL.createObjectURL(blob)
+         })
+      })
+   }
 })();

@@ -2,8 +2,11 @@
     "name": "BU Schedule Downloader",
     "version": "0.1.0",
     "description": "Converts BU class schedule to ics file for Google Calender",
-    "permissions": ["tabs"],
+    "permissions": ["tabs", "downloads"],
     "host_permissions": ["https://*.bu.edu/*"],
+    "background": {
+      "service_worker": "background.js"
+    },
     "content_scripts": [
       {
         "matches": ["https://*.bu.edu/*"],
