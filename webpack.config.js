@@ -4,11 +4,11 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
    entry: {
       popup: './src/popup.js',
-      contentScript: './src/contentScript.js',
+      parseClassesSchedule: './src/parseClassesSchedule.js',
       background: './src/background.js'
    },
    output: {
-      filename:'[name].js',
+      filename:'[name].bundle.js',
       path: path.resolve(__dirname, 'dist')
    },
    mode: 'development',

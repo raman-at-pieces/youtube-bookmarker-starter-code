@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
       // downloads file from url
       chrome.downloads.download({
          url: url, // The object URL can be used as download URL
-         filename: "classSchedule.ics"
+         filename: "Classes Schedule.ics"
       });
    }
 });
