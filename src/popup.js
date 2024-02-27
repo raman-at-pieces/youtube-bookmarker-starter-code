@@ -8,19 +8,11 @@ const setButtonControl = (icon, title, eventListener, parentElement) => {
    controlElement.title = title
 
    controlElement.addEventListener("click", eventListener)
-   // controlElement.style = ""
+   // TODO: style download button: controlElement.style = ""
    parentElement.appendChild(controlElement)
 };
 
-
-const onDownload = async () => {
-   const activeTab = await getActiveTabURL()
-
-   chrome.tabs.sendMessage(activeTab.id, {
-      type: "toDownload"
-   })
-};
-
+// Add listener to popup
 document.addEventListener("DOMContentLoaded", async () => {
    const activeTab = await getActiveTabURL();
 
