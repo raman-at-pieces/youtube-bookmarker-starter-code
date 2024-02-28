@@ -92,6 +92,29 @@ const convertHTMLTableToArray = (htmlTable) => {
    return tableArr
 }
 
+/**
+ * Converts 12hr time to 24hr time
+ * Courtesy Chris Dąbrowski on Stackoverflow
+ * @param {String} time12h 
+ * @returns 
+ */
+const convertTime12to24 = (time12h) => {
+   let time = time12h.slice(0, -2)
+   let modifier = time12h.slice(-2)  // gets last two characters of string
+
+   let [hours, minutes] = time.split(':');
+
+   if (hours === '12') {
+      hours = '00';
+   }
+
+   if (modifier === 'pm') {
+      hours = parseInt(hours, 10) + 12;
+   }
+
+   return `${hours}:${minutes}`;
+}
+
 
 /**
  * Parse one row of HTML element and returns an event object for ics package
@@ -111,10 +134,8 @@ const createClassEvent = (rowArr) => {
    let classLocation = rowArr[7].innerText + " " + rowArr[8].innerText  // "LAW 101"
 
    let day = rowArr[9].innerText.split(",")              // ["Tue", "Thu"]
-   let startTime = rowArr[10].innerText                  // "12:30pm"
-   startTime = startTime.slice(0, -2)
-   let endTime = rowArr[11].innerText                    // "1:45pm"
-   endTime = endTime.slice(0, -2)
+   let startTime = convertTime12to24(rowArr[10].innerText)// "12:30pm" but in 24hr
+   let endTime = convertTime12to24(rowArr[11].innerText) // "1:45pm" but in 24hr
 
    classEvent["title"] = classCode.substr(classCode.indexOf(" ") + 1) + " " + titleAndProf[0] + " " + classType
 
@@ -122,9 +143,9 @@ const createClassEvent = (rowArr) => {
 
    // turn "day" list into rrule fragment
    // visit https://freetools.textmagic.com/rrule-generator to learn more
-   let rrule = day.shift().slice(0,2).toUpperCase()
+   let rrule = day.shift().slice(0, 2).toUpperCase()
    while (day.length != 0) {
-      rrule += "," + day.shift().slice(0,2).toUpperCase()
+      rrule += "," + day.shift().slice(0, 2).toUpperCase()
    }
    let numWeeks = 14; // Assumes 14 weeks in a semester
    let endDate = new Date().setDate(startDate + numWeeks * 7);    // startDate injected from popup.js
