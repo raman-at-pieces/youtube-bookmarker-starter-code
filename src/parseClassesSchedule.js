@@ -21,7 +21,7 @@ const generateClassesCalender = () => {
 
    console.log(classes);
 
-   // TO ICS FILE -----------------------------------------------
+   // TO ICS FILE
    // convert classes array to ics formatting
    let { error, value } = ics.createEvents(classes)
 
@@ -102,47 +102,60 @@ const convertHTMLTableToArray = (htmlTable) => {
  * </td>
  */
 const createClassEvent = (rowArr) => {
-   let classCode = rowArr[0].innerText
-   let titleAndProf = rowArr[4].innerText.split("\n")
-   let classType = rowArr[6].innerText
-   let classLocation = rowArr[7].innerText + rowArr[8].innerText
-   let day = rowArr[9].innerText.split(",")
-   let startTime = rowArr[10].innerText
-   let endTime = rowArr[11].innerText
+   let classEvent = {}
 
-   // TODO: populate classEvent
-   //       reorganize for Sydney's part
-   let classEvent = {
+   let classCode = rowArr[0].innerText                   // "CAS CS210 A1"
+   let titleAndProf = rowArr[4].innerText.split("\n")    // ["Comp Systems", "Narayanan"]
+   let classType = rowArr[6].innerText                   // "Lecture"
 
+   let classLocation = rowArr[7].innerText + " " + rowArr[8].innerText  // "LAW 101"
+
+   let day = rowArr[9].innerText.split(",")              // ["Tue", "Thu"]
+   let startTime = rowArr[10].innerText                  // "12:30pm"
+   startTime = startTime.slice(0, -2)
+   let endTime = rowArr[11].innerText                    // "1:45pm"
+   endTime = endTime.slice(0, -2)
+
+   classEvent["title"] = classCode.substr(classCode.indexOf(" ") + 1) + " " + titleAndProf[0] + " " + classType
+
+   classEvent["location"] = classLocation
+
+   // turn "day" list into rrule fragment
+   // visit https://freetools.textmagic.com/rrule-generator to learn more
+   let rrule = day.shift().slice(0,2).toUpperCase()
+   while (day.length != 0) {
+      rrule += "," + day.shift().slice(0,2).toUpperCase()
    }
+   let numWeeks = 14; // Assumes 14 weeks in a semester
+   let endDate = new Date().setDate(startDate + numWeeks * 7);    // startDate injected from popup.js
+   endDate = endDate.toString().replace("-", "")
 
-   const event = {
-      start: [2018, 5, 30, 6, 30],
-      duration: { hours: 6, minutes: 30 },
-      title: 'Bolder Boulder',
-      description: 'Annual 10-kilometer run in Boulder, Colorado',
-      location: 'Folsom Field, University of Colorado (finish line)',
-      url: 'http://www.bolderboulder.com/',
-      geo: { lat: 40.0095, lon: 105.2669 },
-      categories: ['10k races', 'Memorial Day Weekend', 'Boulder CO'],
-      status: 'CONFIRMED',
-      busyStatus: 'BUSY',
-      organizer: { name: 'Admin', email: 'Race@BolderBOULDER.com' },
-      attendees: [
-         { name: 'Adam Gibbons', email: 'adam@example.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT' },
-         { name: 'Brittany Seaton', email: 'brittany@example2.org', dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
-      ]
-   }
+   classEvent["recurrenceRule"] = "FREQ=WEEKLY;BYDAY=" + rrule + ";INTERVAL=1;UNTIL=" + endDate + "T000000Z"
 
-   return event
+   let start = startDate.concat(startTime.split(":"))    // adds time (e.g. ["8", "55"]) to startDate
+   start.forEach((o, i, a) => a[i] = +a[i])              // turns each element to number
+   classEvent["start"] = start                           // assigns start to class event object
+   console.log("Start:");
+   console.log(start);
+
+   let end = startDate.concat(endTime.split(":"))        // same parse as above
+   end.forEach((o, i, a) => a[i] = +a[i])
+   classEvent["end"] = end
+   console.log("End:");
+   console.log(end);
+
+   return classEvent
 }
 
-
+// main calls to function
 console.log("Parse classes script injected");
+console.log(startDate);
+startDate = startDate.toString().split("-")  // turns date into ["2024", "2", "28"]
 generateClassesCalender()
 
 
 // ics input format:
+// for more info, look at ics's npm documentation
 // const event = {
 //    start: [2018, 5, 30, 6, 30],
 //    duration: { hours: 6, minutes: 30 },
